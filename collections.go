@@ -40,7 +40,7 @@ func CollectionCtx(next http.Handler) http.Handler {
 
 func (e *Engine) ProcesCollections(w http.ResponseWriter, r *http.Request) {
 
-	data, err := json.Marshal(e.Datasource.GetCollections())
+	data, err := json.Marshal(e.GetCollections())
 	if err != nil {
 		log.Fatalf("Could not marshal collections, got error: %v", err)
 	}
@@ -51,7 +51,7 @@ func (e *Engine) ProcesCollections(w http.ResponseWriter, r *http.Request) {
 func (e *Engine) ProcesCollection(w http.ResponseWriter, r *http.Request) {
 	collection := r.Context().Value(collectionKey).(string)
 
-	data, err := json.Marshal(e.Datasource.GetCollection(collection))
+	data, err := json.Marshal(e.GetCollection(collection))
 	if err != nil {
 		log.Fatalf("Could not marshal collections, got error: %v", err)
 	}
