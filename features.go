@@ -22,7 +22,7 @@ func (e *Engine) FeatureHandler() http.Handler {
 
 	r.Route("/items", func(r chi.Router) {
 		r.Get("/", e.ItemsController)
-		r.Route("/{item}", func(r chi.Router) {
+		r.Route("/{id}", func(r chi.Router) {
 			r.Get("/", e.ItemController)
 		})
 	})
@@ -39,5 +39,5 @@ func (e *Engine) ItemsController(w http.ResponseWriter, r *http.Request) {
 func (e *Engine) ItemController(w http.ResponseWriter, r *http.Request) {
 	s := strings.Split(r.URL.Path, "/")
 
-	w.Write([]byte("hello Item " + chi.URLParam(r, "item") + " from " + s[len(s)-3] + " link: " + r.Host + r.RequestURI))
+	w.Write([]byte("hello Item " + chi.URLParam(r, "id") + " from " + s[len(s)-3] + " link: " + r.Host + r.RequestURI))
 }
