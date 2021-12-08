@@ -1,14 +1,12 @@
 package ogcapi
 
 import (
-	"context"
 	"net/http"
+	"strings"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 )
-
-const itemKey = key("item")
 
 type FeaturesParams struct {
 	CollectionId string
@@ -26,31 +24,23 @@ func (e *Engine) FeatureHandler() http.Handler {
 	r.Use(middleware.Logger)
 
 	r.Route("/items", func(r chi.Router) {
-		r.Get("/", e.ProcesItems)
+		r.Get("/", e.ItemsController)
 		r.Route("/{item}", func(r chi.Router) {
-			r.Use(ItemCtx)
-			r.Get("/", e.ProcesItem)
+			r.Get("/", e.ItemController)
 		})
 	})
 
 	return r
 }
 
-func ItemCtx(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		ctx := context.WithValue(r.Context(), itemKey, chi.URLParam(r, "item"))
-		next.ServeHTTP(w, r.WithContext(ctx))
-	})
+func (e *Engine) ItemsController(w http.ResponseWriter, r *http.Request) {
+
+	s := strings.Split(r.URL.Path, "/")
+	w.Write([]byte("hello items from " + s[len(s)-2]))
 }
 
-func (e *Engine) ProcesItems(w http.ResponseWriter, r *http.Request) {
-	collection := r.Context().Value(collectionKey).(string)
-	w.Write([]byte("hello items from " + collection))
-}
+func (e *Engine) ItemController(w http.ResponseWriter, r *http.Request) {
+	s := strings.Split(r.URL.Path, "/")
 
-func (e *Engine) ProcesItem(w http.ResponseWriter, r *http.Request) {
-	collection := r.Context().Value(collectionKey).(string)
-	item := r.Context().Value(itemKey).(string)
-
-	w.Write([]byte("hello Item " + item + " from " + collection + " link: " + r.Host + r.RequestURI))
+	w.Write([]byte("hello Item " + chi.URLParam(r, "item") + " from " + s[len(s)-3] + " link: " + r.Host + r.RequestURI))
 }

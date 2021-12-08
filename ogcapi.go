@@ -6,6 +6,7 @@ import (
 	"github.com/go-chi/chi/v5"
 )
 
+// Feature Model
 type FeatureDatasource interface {
 	GetFeatureCollection(FeaturesParams) FeatureCollection
 	GetFeature(string) Feature
