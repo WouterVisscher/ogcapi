@@ -19,7 +19,7 @@ type GeoJSON struct {
 	features FeatureCollection
 }
 
-func (g *GeoJSON) GetCollections() ogcapi.Collections {
+func (g *GeoJSON) GetCollection() ogcapi.Collection {
 
 	collection := ogcapi.Collection{}
 	collection.Id = g.features.Name
@@ -27,20 +27,7 @@ func (g *GeoJSON) GetCollections() ogcapi.Collections {
 	collection.Description = "Description of the " + g.features.Name
 	collection.ItemType = "feature"
 
-	self := ogcapi.Link{}
-
-	collections := ogcapi.Collections{Collections: []ogcapi.Collection{collection}, Links: []ogcapi.Link{self}}
-
-	return collections
-}
-
-func (g *GeoJSON) GetCollection(c string) ogcapi.Collection {
-
-	collection := ogcapi.Collection{}
-	collection.Id = g.features.Name
-	collection.Title = "Title of the " + g.features.Name
-	collection.Description = "Description of the " + g.features.Name
-	collection.ItemType = "feature"
+	// self := ogcapi.Link{}
 
 	return collection
 }
