@@ -5,7 +5,6 @@ import (
 	"strings"
 
 	"github.com/go-chi/chi/v5"
-	"github.com/go-chi/chi/v5/middleware"
 )
 
 type FeaturesParams struct {
@@ -20,8 +19,6 @@ type FeaturesParams struct {
 func (e *Engine) FeatureHandler() http.Handler {
 
 	r := chi.NewRouter()
-
-	r.Use(middleware.Logger)
 
 	r.Route("/items", func(r chi.Router) {
 		r.Get("/", e.ItemsController)
