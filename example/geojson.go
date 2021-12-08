@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"io/ioutil"
 	"log"
 	"ogcapi"
@@ -33,11 +34,39 @@ func (g *GeoJSON) GetCollection() ogcapi.Collection {
 }
 
 func (g *GeoJSON) GetFeatureCollection(params ogcapi.FeaturesParams) ogcapi.FeatureCollection {
-	return ogcapi.FeatureCollection{}
+
+	fc := []*ogcapi.Feature{}
+
+	for _, f := range g.features.Features {
+		feature := ogcapi.Feature{}
+		feature.ID = f.Properties["id"]
+		feature.Type = f.Type
+		feature.Properties = f.Properties
+		feature.Geometry = f.Geometry
+		fc = append(fc, &feature)
+	}
+
+	return ogcapi.FeatureCollection{Features: fc, Type: "FeatureCollection"}
 }
 
-func (g *GeoJSON) GetFeature(id string) ogcapi.Feature {
-	return ogcapi.Feature{}
+func (g *GeoJSON) GetFeature(collectionid, id string) (ogcapi.Feature, error) {
+
+	feature := ogcapi.Feature{}
+
+	for _, f := range g.features.Features {
+
+		if f.Properties["id"] == id {
+
+			feature.ID = f.Properties["id"]
+			feature.Type = f.Type
+			feature.Properties = f.Properties
+			feature.Geometry = f.Geometry
+			return feature, nil
+		}
+	}
+
+	return feature, errors.New("No feature found with id: " + id)
+
 }
 
 func (g *GeoJSON) Init(path string) {

@@ -10,7 +10,7 @@ import (
 // Feature Model
 type FeatureDatasource interface {
 	GetFeatureCollection(FeaturesParams) FeatureCollection
-	GetFeature(string) Feature
+	GetFeature(string, string) (Feature, error)
 }
 
 type Engine struct {
