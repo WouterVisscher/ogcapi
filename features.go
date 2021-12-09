@@ -35,16 +35,20 @@ func (e *Engine) FeatureHandler() http.Handler {
 func (e *Engine) ItemsController(w http.ResponseWriter, r *http.Request) {
 	s := strings.Split(r.URL.Path, "/")
 
-	limit, err := strconv.Atoi(r.URL.Query()["limit"][0])
-	if err != nil {
-		// TODO return error
-		// Invalid input/query parameters
-		log.Fatalf("Could not marshal collections, got error: %v", err)
-	}
-
 	param := FeaturesParams{
 		CollectionId: s[len(s)-2],
-		Limit:        limit,
+	}
+
+	value := r.URL.Query()["limit"]
+
+	if value != nil {
+		limit, err := strconv.Atoi(value[0])
+		if err != nil {
+			// TODO return error
+			// Invalid input/query parameters
+			log.Fatalf("Could not marshal collections, got error: %v", err)
+		}
+		param.Limit = limit
 	}
 
 	if fc, err := e.FeatureDatasource.GetFeatureCollection(param); err == nil {
