@@ -7,7 +7,17 @@ import (
 	"strings"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/go-spatial/geom/encoding/geojson"
 )
+
+type RawFeatureCollection struct {
+	geojson.FeatureCollection
+	Name string `json:"name"`
+}
+
+type RawFeature struct {
+	geojson.Feature
+}
 
 type FeaturesParams struct {
 	CollectionId string
@@ -24,7 +34,7 @@ func (e *Engine) FeatureHandler() http.Handler {
 
 	r.Route("/items", func(r chi.Router) {
 		r.Get("/", e.ItemsController)
-		r.Route("/{id}", func(r chi.Router) {
+		r.Route("/{featureId}", func(r chi.Router) {
 			r.Get("/", e.ItemController)
 		})
 	})
@@ -61,7 +71,7 @@ func (e *Engine) ItemsController(w http.ResponseWriter, r *http.Request) {
 func (e *Engine) ItemController(w http.ResponseWriter, r *http.Request) {
 	s := strings.Split(r.URL.Path, "/")
 
-	if f, err := e.FeatureDatasource.GetFeature(s[len(s)-3], chi.URLParam(r, "id")); err == nil {
+	if f, err := e.FeatureDatasource.GetFeature(s[len(s)-3], chi.URLParam(r, "featureId")); err == nil {
 		w.Write(JSONMarshaller(f))
 	}
 	// TODO, what now?

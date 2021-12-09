@@ -7,14 +7,10 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 )
 
-type ObjectModel interface {
-	AddLinks([]Link)
-}
-
 // Feature Model
 type FeatureDatasource interface {
-	GetFeatureCollection(FeaturesParams) (ObjectModel, error)
-	GetFeature(string, string) (ObjectModel, error)
+	GetFeatureCollection(FeaturesParams) (RawFeatureCollection, error)
+	GetFeature(string, string) (RawFeature, error)
 }
 
 type Engine struct {
@@ -44,9 +40,9 @@ func (e *Engine) GetCollections() (Collections, error) {
 	return Collections{Collections: collections}, nil
 }
 
-func (e *Engine) GetCollection(id string) (Collection, error) {
+func (e *Engine) GetCollection(collectionId string) (Collection, error) {
 
-	collection := e.Collections[id]
+	collection := e.Collections[collectionId]
 
 	return collection, nil
 }

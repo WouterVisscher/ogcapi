@@ -13,21 +13,7 @@ import (
 
 type FeatureCollection struct {
 	geojson.FeatureCollection
-	Name  string `json:"name"`
-	Links []ogcapi.Link
-}
-
-func (featurecollection *FeatureCollection) AddLinks(links []ogcapi.Link) {
-	featurecollection.Links = links
-}
-
-type Feature struct {
-	geojson.Feature
-	Links []ogcapi.Link
-}
-
-func (feature *Feature) AddLinks(links []ogcapi.Link) {
-	feature.Links = links
+	Name string
 }
 
 type GeoJSON struct {
@@ -45,7 +31,7 @@ func (g *GeoJSON) GetCollectionFromGeoJSON() ogcapi.Collection {
 	return collection
 }
 
-func (g *GeoJSON) GetFeatureCollection(params ogcapi.FeaturesParams) (ogcapi.ObjectModel, error) {
+func (g *GeoJSON) GetFeatureCollection(params ogcapi.FeaturesParams) (ogcapi.RawFeatureCollection, error) {
 
 	features := []geojson.Feature{}
 
@@ -58,12 +44,10 @@ func (g *GeoJSON) GetFeatureCollection(params ogcapi.FeaturesParams) (ogcapi.Obj
 		features = append(features, feature)
 	}
 
-	featurecollection := geojson.FeatureCollection{Features: features}
-
-	return &FeatureCollection{FeatureCollection: featurecollection, Name: params.CollectionId}, nil
+	return ogcapi.RawFeatureCollection{FeatureCollection: geojson.FeatureCollection{Features: features}, Name: g.features.Name}, nil
 }
 
-func (g *GeoJSON) GetFeature(collectionid, id string) (ogcapi.ObjectModel, error) {
+func (g *GeoJSON) GetFeature(collectionid, id string) (ogcapi.RawFeature, error) {
 
 	feature := geojson.Feature{}
 
@@ -75,12 +59,11 @@ func (g *GeoJSON) GetFeature(collectionid, id string) (ogcapi.ObjectModel, error
 			feature.Type = f.Type
 			feature.Properties = f.Properties
 			feature.Geometry = f.Geometry
-			return &Feature{Feature: feature}, nil
+			return ogcapi.RawFeature{Feature: feature}, nil
 		}
 	}
 
-	return &Feature{Feature: feature}, errors.New("No feature found with id: " + id)
-
+	return ogcapi.RawFeature{}, errors.New("No feature found with id: " + id)
 }
 
 func (g *GeoJSON) ReadFile(path string) {

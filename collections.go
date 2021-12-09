@@ -14,8 +14,8 @@ func (e *Engine) CollectionsHandler() http.Handler {
 	r.Route("/collections", func(r chi.Router) {
 		r.Get("/", e.CollectionsController)
 
-		for id, collection := range e.Collections {
-			r.Route("/"+id, func(r chi.Router) {
+		for collectionId, collection := range e.Collections {
+			r.Route("/"+collectionId, func(r chi.Router) {
 				r.Get("/", e.CollectionController)
 
 				// TODO maybe switch when tiles/styles/maps/... are added
