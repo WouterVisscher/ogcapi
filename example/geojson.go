@@ -6,14 +6,28 @@ import (
 	"io/ioutil"
 	"log"
 	"ogcapi"
+	"strconv"
 
 	"github.com/go-spatial/geom/encoding/geojson"
 )
 
-// FeatureCollection describes a geoJSON collection feature
 type FeatureCollection struct {
 	geojson.FeatureCollection
-	Name string `json:"name"`
+	Name  string `json:"name"`
+	Links []ogcapi.Link
+}
+
+func (featurecollection *FeatureCollection) AddLinks(links []ogcapi.Link) {
+	featurecollection.Links = links
+}
+
+type Feature struct {
+	geojson.Feature
+	Links []ogcapi.Link
+}
+
+func (feature *Feature) AddLinks(links []ogcapi.Link) {
+	feature.Links = links
 }
 
 type GeoJSON struct {
@@ -28,44 +42,44 @@ func (g *GeoJSON) GetCollectionFromGeoJSON() ogcapi.Collection {
 	collection.Description = "Description of the " + g.features.Name
 	collection.ItemType = "feature"
 
-	// self := ogcapi.Link{}
-
 	return collection
 }
 
-func (g *GeoJSON) GetFeatureCollection(params ogcapi.FeaturesParams) (ogcapi.FeatureCollection, error) {
+func (g *GeoJSON) GetFeatureCollection(params ogcapi.FeaturesParams) (ogcapi.ObjectModel, error) {
 
-	fc := []*ogcapi.Feature{}
+	features := []geojson.Feature{}
 
 	for _, f := range g.features.Features {
-		feature := ogcapi.Feature{}
-		feature.ID = f.Properties["id"]
+		feature := geojson.Feature{}
+		feature.ID = f.ID
 		feature.Type = f.Type
 		feature.Properties = f.Properties
 		feature.Geometry = f.Geometry
-		fc = append(fc, &feature)
+		features = append(features, feature)
 	}
 
-	return ogcapi.FeatureCollection{Features: fc, Type: "FeatureCollection"}, nil
+	featurecollection := geojson.FeatureCollection{Features: features}
+
+	return &FeatureCollection{FeatureCollection: featurecollection, Name: params.CollectionId}, nil
 }
 
-func (g *GeoJSON) GetFeature(collectionid, id string) (ogcapi.Feature, error) {
+func (g *GeoJSON) GetFeature(collectionid, id string) (ogcapi.ObjectModel, error) {
 
-	feature := ogcapi.Feature{}
+	feature := geojson.Feature{}
 
 	for _, f := range g.features.Features {
 
-		if f.Properties["id"] == id {
+		if strconv.Itoa(int(*f.ID)) == id {
 
-			feature.ID = f.Properties["id"]
+			feature.ID = f.ID
 			feature.Type = f.Type
 			feature.Properties = f.Properties
 			feature.Geometry = f.Geometry
-			return feature, nil
+			return &Feature{Feature: feature}, nil
 		}
 	}
 
-	return feature, errors.New("No feature found with id: " + id)
+	return &Feature{Feature: feature}, errors.New("No feature found with id: " + id)
 
 }
 

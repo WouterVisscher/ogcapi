@@ -7,10 +7,14 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 )
 
+type ObjectModel interface {
+	AddLinks([]Link)
+}
+
 // Feature Model
 type FeatureDatasource interface {
-	GetFeatureCollection(FeaturesParams) (FeatureCollection, error)
-	GetFeature(string, string) (Feature, error)
+	GetFeatureCollection(FeaturesParams) (ObjectModel, error)
+	GetFeature(string, string) (ObjectModel, error)
 }
 
 type Engine struct {

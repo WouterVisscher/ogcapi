@@ -32,7 +32,7 @@ func (e *Engine) CollectionsHandler() http.Handler {
 func (e *Engine) CollectionsController(w http.ResponseWriter, r *http.Request) {
 
 	if c, err := e.GetCollections(); err == nil {
-		w.Write(JSONMarshaller(c))
+		w.Write(JSONMarshaller(&c))
 	}
 	// TODO, what now?
 	// Send client error msg that getting collections went wrong
@@ -45,7 +45,7 @@ func (e *Engine) CollectionController(w http.ResponseWriter, r *http.Request) {
 	s := strings.Split(r.URL.Path, "/")
 
 	if c, err := e.GetCollection(s[len(s)-1]); err == nil {
-		w.Write(JSONMarshaller(c))
+		w.Write(JSONMarshaller(&c))
 	}
 	// TODO, what now?
 	// Send client error msg that collection could not be retrieved, while it was defined

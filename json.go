@@ -7,7 +7,7 @@ import (
 	"log"
 )
 
-func JSONMarshaller(i interface{}) []byte {
+func JSONMarshaller(i ObjectModel) []byte {
 
 	if data, err := json.Marshal(i); err == nil {
 		return data

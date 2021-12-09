@@ -7,6 +7,10 @@ type Collections struct {
 	Links       []Link       `json:"links"`
 }
 
+func (collections *Collections) AddLinks(links []Link) {
+	collections.Links = links
+}
+
 type Collection struct {
 	/* identifier of the collection used, for example, in URIs	*/
 	Id string `json:"id"`
@@ -21,6 +25,30 @@ type Collection struct {
 	Links []Link `json:"links"`
 	/* indicator about the type of the items in the collection (the default value is 'feature').	*/
 	ItemType string `json:"itemType,omitempty"`
+}
+
+func (collection *Collection) AddLinks(links []Link) {
+	collection.Links = links
+}
+
+type FeatureCollection struct {
+	NumberReturned int64      `json:"numberReturned,omitempty"`
+	TimeStamp      string     `json:"timeStamp,omitempty"`
+	Type           string     `json:"type"`
+	Features       []*Feature `json:"features"`
+	Links          []Link     `json:"links,omitempty"`
+	NumberMatched  int64      `json:"numberMatched,omitempty"`
+	Crs            string     `json:"crs,omitempty"`
+	Offset         int64      `json:"-"`
+	Next           bool
+}
+
+type Feature struct {
+	// overwrite ID in geojson.Feature so strings are also allowed as id
+	ID interface{} `json:"id,omitempty"`
+	geojson.Feature
+	// Added Links in de document
+	Links []Link `json:"links,omitempty"`
 }
 
 type Extent struct {
@@ -57,26 +85,6 @@ type Temporal struct {
 	   multiple intervals. If multiple intervals are provided, the union of the
 	   intervals describes the temporal extent.	*/
 	Interval [][]string `json:"interval,omitempty"`
-}
-
-type FeatureCollection struct {
-	NumberReturned int64      `json:"numberReturned,omitempty"`
-	TimeStamp      string     `json:"timeStamp,omitempty"`
-	Type           string     `json:"type"`
-	Features       []*Feature `json:"features"`
-	Links          []Link     `json:"links,omitempty"`
-	NumberMatched  int64      `json:"numberMatched,omitempty"`
-	Crs            string     `json:"crs,omitempty"`
-	Offset         int64      `json:"-"`
-	Next           bool
-}
-
-type Feature struct {
-	// overwrite ID in geojson.Feature so strings are also allowed as id
-	ID interface{} `json:"id,omitempty"`
-	geojson.Feature
-	// Added Links in de document
-	Links []Link `json:"links,omitempty"`
 }
 
 type Link struct {
