@@ -1,8 +1,6 @@
 package ogcapi
 
 import (
-	"encoding/json"
-	"log"
 	"net/http"
 	"strings"
 
@@ -33,12 +31,11 @@ func (e *Engine) CollectionsHandler() http.Handler {
 
 func (e *Engine) CollectionsController(w http.ResponseWriter, r *http.Request) {
 
-	data, err := json.Marshal(e.GetCollections())
-	if err != nil {
-		log.Fatalf("Could not marshal collections, got error: %v", err)
+	if c, err := e.GetCollections(); err == nil {
+		w.Write(JSONMarshaller(c))
 	}
-
-	w.Write(data)
+	// TODO, what now?
+	// Send client error msg that getting collections went wrong
 }
 
 func (e *Engine) CollectionController(w http.ResponseWriter, r *http.Request) {
@@ -47,10 +44,9 @@ func (e *Engine) CollectionController(w http.ResponseWriter, r *http.Request) {
 	// but path is already validated by the router
 	s := strings.Split(r.URL.Path, "/")
 
-	data, err := json.Marshal(e.GetCollection(s[len(s)-1]))
-	if err != nil {
-		log.Fatalf("Could not marshal collections, got error: %v", err)
+	if c, err := e.GetCollection(s[len(s)-1]); err == nil {
+		w.Write(JSONMarshaller(c))
 	}
-
-	w.Write(data)
+	// TODO, what now?
+	// Send client error msg that collection could not be retrieved, while it was defined
 }

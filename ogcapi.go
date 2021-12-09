@@ -9,7 +9,7 @@ import (
 
 // Feature Model
 type FeatureDatasource interface {
-	GetFeatureCollection(FeaturesParams) FeatureCollection
+	GetFeatureCollection(FeaturesParams) (FeatureCollection, error)
 	GetFeature(string, string) (Feature, error)
 }
 
@@ -29,7 +29,7 @@ func (e *Engine) GetHandler() http.Handler {
 	return r
 }
 
-func (e *Engine) GetCollections() Collections {
+func (e *Engine) GetCollections() (Collections, error) {
 
 	collections := []Collection{}
 
@@ -37,12 +37,12 @@ func (e *Engine) GetCollections() Collections {
 		collections = append(collections, collection)
 	}
 
-	return Collections{Collections: collections}
+	return Collections{Collections: collections}, nil
 }
 
-func (e *Engine) GetCollection(id string) Collection {
+func (e *Engine) GetCollection(id string) (Collection, error) {
 
 	collection := e.Collections[id]
 
-	return collection
+	return collection, nil
 }

@@ -9,8 +9,8 @@ import (
 func main() {
 
 	geojson := GeoJSON{}
-	geojson.Init("example.geojson")
-	collection := geojson.GetCollection()
+	geojson.ReadFile("example.geojson")
+	collection := geojson.GetCollectionFromGeoJSON()
 
 	e := ogcapi.Engine{FeatureDatasource: &geojson, Collections: map[string]ogcapi.Collection{geojson.features.Name: collection}}
 

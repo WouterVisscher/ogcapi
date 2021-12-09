@@ -20,7 +20,7 @@ type GeoJSON struct {
 	features FeatureCollection
 }
 
-func (g *GeoJSON) GetCollection() ogcapi.Collection {
+func (g *GeoJSON) GetCollectionFromGeoJSON() ogcapi.Collection {
 
 	collection := ogcapi.Collection{}
 	collection.Id = g.features.Name
@@ -33,7 +33,7 @@ func (g *GeoJSON) GetCollection() ogcapi.Collection {
 	return collection
 }
 
-func (g *GeoJSON) GetFeatureCollection(params ogcapi.FeaturesParams) ogcapi.FeatureCollection {
+func (g *GeoJSON) GetFeatureCollection(params ogcapi.FeaturesParams) (ogcapi.FeatureCollection, error) {
 
 	fc := []*ogcapi.Feature{}
 
@@ -46,7 +46,7 @@ func (g *GeoJSON) GetFeatureCollection(params ogcapi.FeaturesParams) ogcapi.Feat
 		fc = append(fc, &feature)
 	}
 
-	return ogcapi.FeatureCollection{Features: fc, Type: "FeatureCollection"}
+	return ogcapi.FeatureCollection{Features: fc, Type: "FeatureCollection"}, nil
 }
 
 func (g *GeoJSON) GetFeature(collectionid, id string) (ogcapi.Feature, error) {
@@ -69,7 +69,7 @@ func (g *GeoJSON) GetFeature(collectionid, id string) (ogcapi.Feature, error) {
 
 }
 
-func (g *GeoJSON) Init(path string) {
+func (g *GeoJSON) ReadFile(path string) {
 
 	bytes, err := ioutil.ReadFile(path)
 	if err != nil {

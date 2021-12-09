@@ -1,7 +1,6 @@
 package ogcapi
 
 import (
-	"encoding/json"
 	"log"
 	"net/http"
 	"strconv"
@@ -39,6 +38,7 @@ func (e *Engine) ItemsController(w http.ResponseWriter, r *http.Request) {
 	limit, err := strconv.Atoi(r.URL.Query()["limit"][0])
 	if err != nil {
 		// TODO return error
+		// Invalid input/query parameters
 		log.Fatalf("Could not marshal collections, got error: %v", err)
 	}
 
@@ -47,23 +47,19 @@ func (e *Engine) ItemsController(w http.ResponseWriter, r *http.Request) {
 		Limit:        limit,
 	}
 
-	data, err := json.Marshal(e.FeatureDatasource.GetFeatureCollection(param))
-	if err != nil {
-		log.Fatalf("Could not marshal collections, got error: %v", err)
+	if fc, err := e.FeatureDatasource.GetFeatureCollection(param); err == nil {
+		w.Write(JSONMarshaller(fc))
 	}
-
-	w.Write(data)
+	// TODO, what now?
+	// Send client error msg that features could not be retrieved
 }
 
 func (e *Engine) ItemController(w http.ResponseWriter, r *http.Request) {
 	s := strings.Split(r.URL.Path, "/")
 
 	if f, err := e.FeatureDatasource.GetFeature(s[len(s)-3], chi.URLParam(r, "id")); err == nil {
-		data, err := json.Marshal(f)
-		if err != nil {
-			log.Fatalf("Could not marshal collections, got error: %v", err)
-		}
-		w.Write(data)
+		w.Write(JSONMarshaller(f))
 	}
 	// TODO, what now?
+	// Send client error msg that feature could not be retrieved
 }
