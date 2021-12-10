@@ -1,6 +1,7 @@
 package ogcapi
 
 import (
+	"log"
 	"net/http"
 	"strings"
 
@@ -31,11 +32,16 @@ func (e *Engine) CollectionsHandler() http.Handler {
 
 func (e *Engine) CollectionsController(w http.ResponseWriter, r *http.Request) {
 
-	if c, err := e.GetCollections(); err == nil {
-		w.Write(JSONMarshaller(&c))
+	c, err := e.GetCollections()
+	if err != nil {
+		// TODO, what now?
+		// Send client error msg that getting collections went wrong
+		log.Fatalf("not collections found, got error: %v", err)
 	}
-	// TODO, what now?
-	// Send client error msg that getting collections went wrong
+
+	key := "json"
+
+	e.GetRenderer(key)(w, c)
 }
 
 func (e *Engine) CollectionController(w http.ResponseWriter, r *http.Request) {
@@ -44,9 +50,14 @@ func (e *Engine) CollectionController(w http.ResponseWriter, r *http.Request) {
 	// but path is already validated by the router
 	s := strings.Split(r.URL.Path, "/")
 
-	if c, err := e.GetCollection(s[len(s)-1]); err == nil {
-		w.Write(JSONMarshaller(&c))
+	c, err := e.GetCollection(s[len(s)-1])
+	if err == nil {
+		// TODO, what now?
+		// Send client error msg that collection could not be retrieved, while it was defined
+		log.Fatalf("not collectionc found, got error: %v", err)
 	}
-	// TODO, what now?
-	// Send client error msg that collection could not be retrieved, while it was defined
+
+	key := "json"
+
+	e.GetRenderer(key)(w, c)
 }

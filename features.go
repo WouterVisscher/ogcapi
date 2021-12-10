@@ -10,11 +10,13 @@ import (
 	"github.com/go-spatial/geom/encoding/geojson"
 )
 
+// TODO think of better name
 type RawFeatureCollection struct {
 	geojson.FeatureCollection
 	Name string `json:"name"`
 }
 
+// TODO also think of better name
 type RawFeature struct {
 	geojson.Feature
 }
@@ -61,19 +63,29 @@ func (e *Engine) ItemsController(w http.ResponseWriter, r *http.Request) {
 		param.Limit = limit
 	}
 
-	if fc, err := e.FeatureDatasource.GetFeatureCollection(param); err == nil {
-		w.Write(JSONMarshaller(fc))
+	fc, err := e.FeatureDatasource.GetFeatureCollection(param)
+	if err != nil {
+		// TODO, what now?
+		// Send client error msg that features could not be retrieved
+		log.Fatalf("not data found, got error: %v", err)
 	}
-	// TODO, what now?
-	// Send client error msg that features could not be retrieved
+
+	key := "json"
+
+	e.GetRenderer(key)(w, fc)
+
 }
 
 func (e *Engine) ItemController(w http.ResponseWriter, r *http.Request) {
 	s := strings.Split(r.URL.Path, "/")
 
-	if f, err := e.FeatureDatasource.GetFeature(s[len(s)-3], chi.URLParam(r, "featureId")); err == nil {
-		w.Write(JSONMarshaller(f))
+	f, err := e.FeatureDatasource.GetFeature(s[len(s)-3], chi.URLParam(r, "featureId"))
+	if err != nil {
+		// TODO, what now?
+		// Send client error msg that feature could not be retrieved
+		log.Fatalf("not data found, got error: %v", err)
 	}
-	// TODO, what now?
-	// Send client error msg that feature could not be retrieved
+	key := "json"
+
+	e.GetRenderer(key)(w, f)
 }

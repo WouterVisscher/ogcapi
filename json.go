@@ -3,6 +3,7 @@ package ogcapi
 import (
 	"encoding/json"
 	"log"
+	"net/http"
 
 	"github.com/go-spatial/geom/encoding/geojson"
 )
@@ -93,13 +94,13 @@ type Link struct {
 	Href     string `json:"href"`
 }
 
-func JSONMarshaller(i interface{}) []byte {
-
-	if data, err := json.Marshal(i); err == nil {
-		return data
-	} else {
+// Default JSON renderer
+func DefaultJSONRender(w http.ResponseWriter, i interface{}) {
+	data, err := json.Marshal(i)
+	if err != nil {
 		log.Fatalf("Could not marshal collections, got error: %v", err)
 		// TODO build nice Exception message for client
-		return nil
 	}
+
+	w.Write(data)
 }

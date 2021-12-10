@@ -15,6 +15,7 @@ type FeatureDatasource interface {
 
 type Engine struct {
 	Collections       map[string]Collection
+	Renderers         map[string]func(http.ResponseWriter, interface{})
 	FeatureDatasource FeatureDatasource
 }
 
@@ -45,4 +46,9 @@ func (e *Engine) GetCollection(collectionId string) (Collection, error) {
 	collection := e.Collections[collectionId]
 
 	return collection, nil
+}
+
+func (e *Engine) GetRenderer(key string) func(http.ResponseWriter, interface{}) {
+	r := e.Renderers[key]
+	return r
 }
